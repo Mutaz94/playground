@@ -1,9 +1,11 @@
-# implementation of IMP 
+#
+# implementation of simple importance sampling 
 #
 #
 using Distributions 
 
 function f_x(x)
+    """ function maps [-inf, inf] -> [0, 1] """
     return 1/(1 + exp(-x))
 end
 
@@ -17,7 +19,7 @@ end
 const n = 10000
 
 const mu_true = 5
-const mu_appro = 4.2
+const mu_appro = 4.8
 
 const sigma_true = 1.5
 const sigma_appro = 1 
@@ -44,4 +46,4 @@ for i = 1:n
     value[i] = val 
 end
 
-println(" IMP  value 1/n ∑ f(x)p_x/q_x = $(sum(value)/n)") 
+println(" IMP  value 1/n ∑ f(x)p_x/q_x = $(sum(value)/n) ") 
