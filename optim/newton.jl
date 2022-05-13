@@ -1,3 +1,4 @@
+# Ref: https://en.wikipedia.org/wiki/Gauss%E2%80%93Newton_algorithm
 
 const n = 20 
 const x = 11
@@ -40,7 +41,7 @@ function newton(θ, tol::Float64)
 
 
     j = 0
-    θ₁ = 0.9
+    θ₁ = 10
     while abs(θ - θ₁) > tol 
         j += 1
         delta = score(θ)/hess(θ)
