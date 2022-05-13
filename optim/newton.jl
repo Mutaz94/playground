@@ -31,12 +31,22 @@ function hess(θ)
     return n * p * q
 end 
 
-let delta = 0.01
-    while θ + delta != θ
+function newton(θ, tol::Float64)
+    delta = score(θ)/hess(θ)
+    println("initial delta= ", delta) 
+    println("initial θ= ", θ) 
+    j = 0
+    
+    while abs(θ - delta) > tol 
+        j += 1
         delta = score(θ)/hess(θ)
-        θ = θ + delta 
+        θ = θ + delta
+        println("θ =", θ)
     end 
-end 
+end
+
+newton(θ, 1e-14) 
+
 
 
 
