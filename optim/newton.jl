@@ -35,13 +35,22 @@ function newton(θ, tol::Float64)
     delta = score(θ)/hess(θ)
     println("initial delta= ", delta) 
     println("initial θ= ", θ) 
+    println("Initial OFV = ", log_like(θ))
+    println("----------------------------") 
+
+
     j = 0
-    
-    while abs(θ - delta) > tol 
+    θ₁ = 0.9
+    while abs(θ - θ₁) > tol 
         j += 1
         delta = score(θ)/hess(θ)
-        θ = θ + delta
+        θ₁ = θ
+        θ = θ₁ + delta
+        println("ITERATION $j")
         println("θ =", θ)
+        println("Score = ", score(θ))
+        println("OFV = ", log_like(θ))
+        println("=============================") 
     end 
 end
 
