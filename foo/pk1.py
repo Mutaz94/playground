@@ -8,7 +8,7 @@ import numpy as np
 def fn_pk_one(param, time):
     # BUILD FIRST ASSERTION
     for p in param:
-        assert p > 0, f'parameter {p} must be non-negative'
+        assert p > 0, f'parameter = {p} must be non-negative'
 
     # DEFINE PARAMETERS
     CL, V, DOSE = param
