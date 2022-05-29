@@ -8,8 +8,7 @@ program one_com
   implicit none
 
 
-  real, dimension(10) :: time
-  real, dimension(size(time)) :: Y
+  real, dimension(:), allocatable :: time, Y
   character(len=20) :: filename
   character(len=20) :: time_array
   ! define some integers
@@ -35,6 +34,10 @@ program one_com
 
   time_array = "time.txt"
   ntime = 10
+
+  allocate(time(ntime))
+  allocate(Y(ntime))
+
   !iErr = 0
   open(2, file=time_array, status="old", iostat=iErr)
   if (iErr /= 0) then
@@ -46,11 +49,12 @@ program one_com
   end do
   close(2)
   DOSE = 500
-  write (*, "(A12, 1x, A12)"), "TIME", "CONC"
+  open(3, file="data.out", status="new")
+  write (3, "(A12, 1x, A12)"), "TIME", "CONC"
   do n=1,ntime
     Y(n) = one_compartment_oral(p(1), p(2), p(3), DOSE, time(n))
-    write(*, "(es12.3,1x,es12.3)"), time(n), Y(n)
+    write(3, "(es12.3,1x,es12.3)"), time(n), Y(n)
   end do
-
+  print *, 'SIMULATION IS DONE: CHECK data.out'
 
 end program one_com

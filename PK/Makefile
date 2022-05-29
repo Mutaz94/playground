@@ -5,10 +5,10 @@ SRC=advan.f90 one.f90
 OBJ=$(SRC:.f90=.o)
 
 %.o: %.f90
-	$(FC) $(FFLAGS) -o $@ -c $< 
+	$(FC) $(FFLAGS) -o $@ -c $<
 
 one_pk: $(OBJ)
 	$(FC) $(FFLAGS) -o $@ $(OBJ)
 
 clean:
-	@rm *.o *.mod 
+	@rm *.o *.mod one_pk *.out
