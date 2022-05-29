@@ -13,7 +13,7 @@ contains
     real :: k
     k = cl/v
 
-    one_compartment_oral = d/v * ka/(ka - k) * (exp(-k *t - exp(-ka * t)))
+    one_compartment_oral = d/v * ka/(ka - k) * (exp(-k *t) - exp(-ka * t))
   end function one_compartment_oral
 
 end module advan2
