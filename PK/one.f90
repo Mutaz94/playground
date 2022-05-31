@@ -5,6 +5,7 @@
 
 program one_com
   use advan2, only: one_compartment_oral
+!  use stdlib_stats, only: mean 
   implicit none
 
 
@@ -55,6 +56,8 @@ program one_com
     Y(n) = one_compartment_oral(p(1), p(2), p(3), DOSE, time(n))
     write(3, "(es12.3,1x,es12.3)"), time(n), Y(n)
   end do
+  close(3) 
   print *, 'SIMULATION IS DONE: CHECK data.out'
+  print *, "Mean concentration = ", mean(Y) 
 
 end program one_com

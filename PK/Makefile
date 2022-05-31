@@ -11,4 +11,4 @@ one_pk: $(OBJ)
 	$(FC) $(FFLAGS) -o $@ $(OBJ)
 
 clean:
-	@rm *.o *.mod one_pk *.out
+	@rm *.o *.mod one_pk *.ou
