@@ -24,9 +24,14 @@ LL = Vector{Float64}(undef, length(obs))
 μ  = Vector{Float64}(undef, length(obs)) 
 
 # Vectorize KA. 
+# Create a grid from 0.1 to 3 by 0.1
+ka_grid = collect(0.1:0.1:3.0) 
+for j in ka_grid
+    for i in 1:length(obs)
+        μ[i] = one_com([V, j, K], 0.3, 100)
+        LL[i] = (μ[i], obs[i]) 
+    end
+end
 
-for i in 1:length(obs)
-    μ[i] = one_com([V, 
-    LL[i] 
 
 
