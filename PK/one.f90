@@ -51,13 +51,13 @@ program one_com
   close(2)
   DOSE = 500
   open(3, file="data.out", status="new")
-!  write (3, "(A12, 1x, A12)"), "TIME", "CONC"
+!  write (3, "(A12, 1x, A12)") "TIME", "CONC"
   do n=1,ntime
     Y(n) = one_compartment_oral(p(1), p(2), p(3), DOSE, time(n))
-    write(3, "(es12.3,1x,es12.3)"), time(n), Y(n)
+    write(3, "(es12.3,1x,es12.3)") time(n), Y(n)
   end do
   close(3) 
   print *, 'SIMULATION IS DONE: CHECK data.out'
-  print *, "Mean concentration = ", mean(Y) 
+!  print *, "Mean concentration = ", mean(Y) 
 
 end program one_com
