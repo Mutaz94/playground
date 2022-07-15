@@ -1,0 +1,104 @@
+
+R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin17.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tidyverse)
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+> library(mrgsolve)
+
+Attaching package: ‘mrgsolve’
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+> library(jsonlite) 
+
+Attaching package: ‘jsonlite’
+
+The following object is masked from ‘package:purrr’:
+
+    flatten
+
+> 
+> 
+> model_code <- "
++ $PROB ONE COM
++ $CMT GUT CENT 
++ $PARAM CL=8.0, V=25.0, KA=1.5
++ $SIGMA 0.01
++ $ODE
++ dxdt_GUT = -KA * GUT; 
++ dxdt_CENT= KA * GUT - (CL/V) * CENT; 
++ $ERROR 
++ capture DV = CENT/V + (CENT/V)*EPS(1);
++ " 
+> 
+> model <- mcode("one_comp", model_code) 
+Building one_comp ... done.
+> 
+> sample_times <- c(0.5, 1, 1.5, 2, 4, 6, 8, 12, 24) 
+> dose <- 500
+> event <- ev(amt=500) 
+> 
+> sim <- model %>%
++     mrgsim_df(event, tgrid=sample_times, end=24, carry_out="amt,evid,cmt") %>%
++     select(ID, time, DV, amt, evid,cmt) %>%
++     mutate(cmt=ifelse(cmt == 0, 2, 1),
++            addl=24,
++            ii=0,
++            ss=0,
++            rate=0)  
+> 
+> 
+> #----------------------------------------------------------------------------
+> # Create stan dataset
+> #----------------------------------------------------------------------------
+> 
+> N <- nrow(sim) 
+> iObs <- with(sim, (1:N)[evid == 0])
+> nObs <- length(iObs) 
+> 
+> stan_data <- with(sim,
++                   list(iObs = iObs, 
++                        N = N, 
++                        nObs = nObs, 
++                        cObs = DV[iObs],
++                        time = time,
++                        evid = evid,
++                        amt  = amt,
++                        cmt = cmt,
++                        addl=addl,
++                        ss=ss,
++                        ii=ii)) 
+> 
+> stan_json <- toJSON(stan_data)
+> 
+> write(stan_json, "data.json")
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  2.548   0.356   3.302 

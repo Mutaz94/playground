@@ -1,0 +1,65 @@
+
+data {
+    int<lower = 1> N; 
+    int<lower = 1> nObs;
+    int<lower = 1> iObs[nObs]; 
+    
+    int<lower = 1> cmt[N]; 
+    int evid[N];
+    real amt[N]; 
+    real time[N]; 
+    int addl[N];
+    real rate[N]; 
+    int ss[N];
+    real ii[N];
+
+
+    vector<lower = 0>[nObs] cObs; 
+}
+
+
+transformed data {
+    int nTheta = 3;
+    int nCmt = 2;
+}
+
+parameters {
+    real<lower = 0.01> CL;
+    real<lower = 0.01> V; 
+    real<lower = 0.01> ka;
+    real<lower = 0> sigma; 
+}
+
+
+transformed parameters {
+    real theta[nTheta] = {CL, V, ka}; 
+    row_vector<lower = 0> [N] yhat; 
+    matrix<lower=0> [nCmt, N] mass; 
+
+    mass = pmx_solve_onecpt(time, amt,rate, ii, evid, cmt, addl, ss, theta); 
+
+    yhat = mass[2, ] ./ V; 
+
+}
+
+
+model {
+    // priors 
+    CL ~ lognormal(log(8), 0.3); 
+    V  ~ lognormal(log(25), 0.1); 
+    ka ~ lognormal(log(1.5), 0.1); 
+    sigma ~ cauchy(0, 1); 
+
+    cObs ~ lognormal(log(yhat[iObs]), sigma); 
+}
+
+generated quantities {
+  real concentrationObsPred[nObs] 
+    = lognormal_rng(log(yhat[iObs]), sigma);
+
+  vector[nObs] log_lik;
+  for (i in 1:nObs)
+    log_lik[i] = lognormal_lpdf(cObs[i] | 
+                                  log(yhat[iObs[i]]), sigma);
+}
+
