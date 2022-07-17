@@ -1,4 +1,12 @@
 
+functions {
+    real one_comp(real time, real dose, real CL, real V, real ka) {
+        real k; 
+        k = CL/V; 
+
+        return dose/V * ka/(ka - k) * (exp(-k * time) - exp(-ka * time)); 
+    }
+}
 data {
     int<lower = 1> N; 
     int<lower = 1> nObs;
@@ -7,7 +15,7 @@ data {
     int<lower = 1> cmt[N]; 
     int evid[N];
     real amt[N]; 
-    real time[N]; 
+    real time[nObs]; 
     int addl[N];
     real rate[N]; 
     int ss[N];
@@ -16,7 +24,6 @@ data {
 
     vector<lower = 0>[nObs] cObs; 
 }
-
 
 transformed data {
     int nTheta = 3;
@@ -33,13 +40,10 @@ parameters {
 
 transformed parameters {
     real theta[nTheta] = {CL, V, ka}; 
-    row_vector<lower = 0> [N] yhat; 
-    matrix<lower=0> [nCmt, N] mass; 
-
-    mass = pmx_solve_onecpt(time, amt,rate, ii, evid, cmt, addl, ss, theta); 
-
-    yhat = mass[2, ] ./ V; 
-
+    vector<lower = 0>[nObs] yhat; 
+    for (i in 1:nObs) {
+         yhat[i] = one_comp(time[i], amt[i], CL, V, ka ); 
+    }
 }
 
 

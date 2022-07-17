@@ -1,4 +1,4 @@
-library(cmdstanr)
+library(rstan)
 library(tidyverse)
 library(jsonlite) 
 source('sims.r') 
@@ -17,9 +17,15 @@ init <- function() {
 
 
 n_chains <- 4
-model <- cmdstan_model("model.stan") 
+# model <- cmdstan_model("model.stan") 
 
 
-fit <- model$sample(data=data, init=init, chains = n_chains,
-            iter_warmup = 1500, iter_sampling = 500,
-            adapt_delta=0.8, refresh=10) 
+# fit <- model$sample(data=data, init=init, chains = n_chains,
+#             iter_warmup = 1500, iter_sampling = 500,
+#             adapt_delta=0.8, refresh=10) 
+
+fit <- stan("model.stan", 
+            data = data, 
+            init=init, 
+            chains=3,
+            refresh=10) 

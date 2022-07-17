@@ -6,7 +6,7 @@ using StatsPlots
 
 
 function one_comp(du, u, p, t) 
-    cl, v, ka = p 
+    (cl, v, ka) = p 
 
     @inbounds begin
         du[1] = - ka * u[1]
@@ -26,7 +26,7 @@ prob = ODEProblem(one_comp, u0, interval, θ);
 
 # Create observed concentrations
 
-const sample_times = [0,0.5, 1, 1.5, 2, 4, 6, 8, 12, 24]; 
+sample_times = [0.5, 1, 1.5, 2, 4, 6, 8, 12, 24]; 
 
 sol = solve(prob, Tsit5(),saveat=sample_times) 
 
@@ -45,12 +45,12 @@ obs = predicted .+ predicted .* ϵ;
 # Check units as it sounds there is incons
 @model function one_comp(obs, times, prob) 
     # define prior information 
-    σ ~ truncated(Cauchy(0.0, 0.5), 0.0, 2.0) 
+    σ ~ truncated(Cauchy(0.0, 0.2), 0.0, 2.0) 
     
     # define individual 
-    Ka ~ LogNormal(log(1.5), 0.3)
-    V  ~ LogNormal(log(25.), 0.3) 
-    CL ~ LogNormal(log(8.), 0.3) 
+    Ka ~ LogNormal(log(1.5), 0.2)
+    V  ~ LogNormal(log(25.), 0.2) 
+    CL ~ LogNormal(log(8.), 0.2) 
 
     θ = [CL, V, Ka] 
     
@@ -65,8 +65,8 @@ end
 
 
 model = one_comp(obs, sample_times, prob) 
-chain = sample(model, HMC(0.1, 5), MCMCSerial(), 1500, 3)
-# plot(chain) 
+chain = sample(model, NUTS(0.65) , MCMCSerial(), 1000, 3)
+plot(chain) 
 
 
 
