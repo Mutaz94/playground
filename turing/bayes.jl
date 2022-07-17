@@ -1,3 +1,11 @@
+########################################################################
+# 
+#  Project: Bayesian analysis
+#  desc: Individual fitting 
+#  author: Mutaz M. Jaber (c) 2022
+#
+########################################################################
+
 using Turing 
 using DifferentialEquations 
 using Plots
@@ -45,12 +53,12 @@ obs = predicted .+ predicted .* ϵ;
 # Check units as it sounds there is incons
 @model function one_comp(obs, times, prob) 
     # define prior information 
-    σ ~ truncated(Cauchy(0.0, 0.2), 0.0, 2.0) 
+    σ ~ truncated(Cauchy(0.0, 0.2), 0.0, 2.0) # Gamma(1, 0.3)  
     
-    # define individual 
-    Ka ~ LogNormal(log(1.5), 0.2)
-    V  ~ LogNormal(log(25.), 0.2) 
-    CL ~ LogNormal(log(8.), 0.2) 
+    # define prior information  
+    Ka ~ LogNormal(log(1), 0.2)
+    V  ~ LogNormal(log(30.), 0.2) 
+    CL ~ LogNormal(log(5.), 0.2) 
 
     θ = [CL, V, Ka] 
     
