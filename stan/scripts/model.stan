@@ -1,11 +1,15 @@
-
+// Not working, check ODE
 functions {
-    real one_comp(real time, real dose, real CL, real V, real ka) {
-        real k; 
-        k = CL/V; 
 
-        return dose/V * ka/(ka - k) * (exp(-k * time) - exp(-ka * time)); 
+    vector dxdt(real t, vector y, vector theta) {
+        vector [2] ydot; 
+
+        ydot[1] = theta[3] * y[1];
+        ydot[2] = theta[3] * y[1] - (theta[1]/theta[2]) * y[2];
+
+        return ydot; 
     }
+
 }
 data {
     int<lower = 1> N; 
@@ -15,7 +19,7 @@ data {
     int<lower = 1> cmt[N]; 
     int evid[N];
     real amt[N]; 
-    real time[nObs]; 
+    real time[N]; 
     int addl[N];
     real rate[N]; 
     int ss[N];
@@ -40,10 +44,9 @@ parameters {
 
 transformed parameters {
     real theta[nTheta] = {CL, V, ka}; 
-    vector<lower = 0>[nObs] yhat; 
-    for (i in 1:nObs) {
-         yhat[i] = one_comp(time[i], amt[i], CL, V, ka ); 
-    }
+    vector<lower = 0>[N] yhat; 
+    vector[2] y0 = {amt[N], 0.0};
+    yhat = ode_rk45(dxdt, y0, time, theta); 
 }
 
 
